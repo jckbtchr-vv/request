@@ -1,0 +1,23 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Submission {
+  id           String   @id @default(cuid())
+  content      String   // link or quote
+  socialHandle String
+  status       String   @default("pending") // pending, completed, rejected
+  response     String?  // admin notes
+  responseUrl  String?  // uploaded visual URL
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
