@@ -12,6 +12,7 @@ interface Submission {
 const content = ref('')
 const socialHandle = ref('')
 const email = ref('')
+const isPublic = ref(true)
 const isSubmitting = ref(false)
 const success = ref(false)
 
@@ -37,13 +38,15 @@ const handleSubmit = async () => {
       body: {
         content: content.value,
         socialHandle: socialHandle.value,
-        email: email.value || null
+        email: email.value || null,
+        isPublic: isPublic.value
       }
     })
     success.value = true
     content.value = ''
     socialHandle.value = ''
     email.value = ''
+    isPublic.value = true
     setTimeout(() => { success.value = false }, 3000)
   } catch (error) {
     console.error('Failed to submit:', error)
@@ -89,6 +92,11 @@ const hasVoted = (id: string) => votedIds.value.has(id)
         <div class="form-group">
           <label>Email (optional)</label>
           <input v-model="email" type="email" placeholder="you@example.com" />
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+          <input id="isPublic" v-model="isPublic" type="checkbox" style="width: auto;" />
+          <label for="isPublic" style="margin: 0; color: var(--fg);">Public submission</label>
         </div>
 
         <button type="submit" :disabled="isSubmitting">

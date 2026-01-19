@@ -15,6 +15,7 @@ model Submission {
   content      String   // link or quote
   socialHandle String
   email        String?  // for notification when visual is created
+  isPublic     Boolean  @default(true) // show in vote/browse columns
   status       String   @default("pending") // pending, approved, completed, rejected
   votes        Int      @default(0)
   response     String?  // admin notes

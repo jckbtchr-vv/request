@@ -3,7 +3,8 @@ import { prisma } from '~/server/utils/prisma'
 export default defineEventHandler(async () => {
   const submissions = await prisma.submission.findMany({
     where: {
-      status: 'completed'
+      status: 'completed',
+      isPublic: true
     },
     orderBy: {
       updatedAt: 'desc'

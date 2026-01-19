@@ -14,7 +14,8 @@ export default defineEventHandler(async (event) => {
     data: {
       content: body.content,
       socialHandle: body.socialHandle,
-      email: body.email || null
+      email: body.email || null,
+      isPublic: body.isPublic !== false
     }
   })
 

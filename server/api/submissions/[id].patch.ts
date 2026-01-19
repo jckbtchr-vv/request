@@ -16,7 +16,8 @@ export default defineEventHandler(async (event) => {
     data: {
       status: body.status,
       response: body.response,
-      responseUrl: body.responseUrl
+      responseUrl: body.responseUrl,
+      isPublic: body.isPublic
     }
   })
 

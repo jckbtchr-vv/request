@@ -29,6 +29,7 @@ interface Submission {
   content: string
   socialHandle: string
   email: string | null
+  isPublic: boolean
   status: string
   votes: number
   response: string | null
@@ -44,7 +45,8 @@ const uploading = ref(false)
 const editForm = ref({
   status: '',
   response: '',
-  responseUrl: ''
+  responseUrl: '',
+  isPublic: true
 })
 
 const startEditing = (submission: Submission) => {
@@ -52,13 +54,14 @@ const startEditing = (submission: Submission) => {
   editForm.value = {
     status: submission.status,
     response: submission.response || '',
-    responseUrl: submission.responseUrl || ''
+    responseUrl: submission.responseUrl || '',
+    isPublic: submission.isPublic
   }
 }
 
 const cancelEditing = () => {
   editingId.value = null
-  editForm.value = { status: '', response: '', responseUrl: '' }
+  editForm.value = { status: '', response: '', responseUrl: '', isPublic: true }
 }
 
 const handleFileUpload = async (event: Event) => {
@@ -164,6 +167,9 @@ const statusColor = (status: string) => {
               <div v-if="submission.votes > 0" class="item-meta" style="margin-top: 0.5rem;">
                 {{ submission.votes }} vote{{ submission.votes !== 1 ? 's' : '' }}
               </div>
+              <div class="item-meta" style="margin-top: 0.5rem;">
+                {{ submission.isPublic ? 'Public' : 'Private' }}
+              </div>
             </div>
           </div>
 
@@ -188,6 +194,11 @@ const statusColor = (status: string) => {
                   <option value="completed">Completed</option>
                   <option value="rejected">Rejected</option>
                 </select>
+              </div>
+
+              <div class="form-group" style="display: flex; align-items: center; gap: 0.5rem;">
+                <input id="editPublic" v-model="editForm.isPublic" type="checkbox" style="width: auto;" />
+                <label for="editPublic" style="margin: 0; color: var(--fg);">Public</label>
               </div>
 
               <div class="form-group">
