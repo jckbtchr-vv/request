@@ -14,7 +14,9 @@ model Submission {
   id           String   @id @default(cuid())
   content      String   // link or quote
   socialHandle String
-  status       String   @default("pending") // pending, completed, rejected
+  email        String?  // for notification when visual is created
+  status       String   @default("pending") // pending, approved, completed, rejected
+  votes        Int      @default(0)
   response     String?  // admin notes
   responseUrl  String?  // uploaded visual URL
   createdAt    DateTime @default(now())

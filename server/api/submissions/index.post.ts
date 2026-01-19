@@ -13,7 +13,8 @@ export default defineEventHandler(async (event) => {
   const submission = await prisma.submission.create({
     data: {
       content: body.content,
-      socialHandle: body.socialHandle
+      socialHandle: body.socialHandle,
+      email: body.email || null
     }
   })
 

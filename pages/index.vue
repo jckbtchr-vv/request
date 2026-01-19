@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const content = ref('')
 const socialHandle = ref('')
+const email = ref('')
 const isSubmitting = ref(false)
 const success = ref(false)
 
@@ -12,7 +13,8 @@ const handleSubmit = async () => {
       method: 'POST',
       body: {
         content: content.value,
-        socialHandle: socialHandle.value
+        socialHandle: socialHandle.value,
+        email: email.value || null
       }
     })
 
@@ -20,6 +22,7 @@ const handleSubmit = async () => {
       success.value = true
       content.value = ''
       socialHandle.value = ''
+      email.value = ''
       setTimeout(() => {
         success.value = false
       }, 5000)
@@ -36,20 +39,17 @@ const handleSubmit = async () => {
   <div>
     <div class="hero">
       <h1>Request a Visual</h1>
-      <p class="mono" style="font-size: 1.1rem; max-width: 760px">
-        Submit your link or quote with your social handle to request a visual in VV style.
-      </p>
+      <p>Submit your link or quote to request a visual.</p>
     </div>
 
     <div class="content">
-      <div style="text-align: right; margin-bottom: 2rem">
-        <NuxtLink to="/admin" class="nav-link">
-          Admin Dashboard
-        </NuxtLink>
+      <div style="margin-bottom: 2rem; display: flex; gap: 1rem">
+        <NuxtLink to="/vote" class="nav-link">Vote</NuxtLink>
+        <NuxtLink to="/admin" class="nav-link">Admin</NuxtLink>
       </div>
 
-      <div v-if="success" class="success-message" style="margin-bottom: 2rem">
-        ✓ Request Submitted Successfully
+      <div v-if="success" class="success-message">
+        Request Submitted
       </div>
 
       <div class="form-card">
@@ -73,6 +73,16 @@ const handleSubmit = async () => {
               type="text"
               placeholder="@username"
               required
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email (optional, for notification)</label>
+            <input
+              id="email"
+              v-model="email"
+              type="email"
+              placeholder="you@example.com"
             />
           </div>
 
