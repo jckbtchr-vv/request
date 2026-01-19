@@ -3,7 +3,9 @@ interface Submission {
   id: string
   content: string
   socialHandle: string
+  email: string | null
   status: string
+  votes: number
   response: string | null
   responseUrl: string | null
   createdAt: string
@@ -71,8 +73,9 @@ const formatDate = (dateString: string) => {
       </div>
 
       <div class="content">
-        <div style="margin-bottom: 2rem">
+        <div style="margin-bottom: 2rem; display: flex; gap: 1rem">
           <NuxtLink to="/" class="nav-link">Back</NuxtLink>
+          <NuxtLink to="/vote" class="nav-link">Vote Page</NuxtLink>
         </div>
 
         <div class="admin-grid">
@@ -85,10 +88,16 @@ const formatDate = (dateString: string) => {
               <div>
                 <div class="submission-meta">{{ formatDate(submission.createdAt) }}</div>
                 <div class="submission-meta">{{ submission.socialHandle }}</div>
+                <div v-if="submission.email" class="submission-meta">{{ submission.email }}</div>
               </div>
-              <span :class="`status-badge status-${submission.status}`">
-                {{ submission.status }}
-              </span>
+              <div style="text-align: right">
+                <span :class="`status-badge status-${submission.status}`">
+                  {{ submission.status }}
+                </span>
+                <div v-if="submission.votes > 0" style="margin-top: 0.5rem; color: var(--muted)">
+                  {{ submission.votes }} vote{{ submission.votes !== 1 ? 's' : '' }}
+                </div>
+              </div>
             </div>
 
             <div class="submission-content">
@@ -113,6 +122,7 @@ const formatDate = (dateString: string) => {
                   <label>Status</label>
                   <select v-model="editForm.status">
                     <option value="pending">Pending</option>
+                    <option value="approved">Approved (open for voting)</option>
                     <option value="completed">Completed</option>
                     <option value="rejected">Rejected</option>
                   </select>

@@ -168,6 +168,11 @@ button:disabled {
   border-color: #ffc107;
 }
 
+.status-approved {
+  color: #17a2b8;
+  border-color: #17a2b8;
+}
+
 .status-completed {
   color: #28a745;
   border-color: #28a745;
