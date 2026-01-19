@@ -29,3 +29,4 @@ logs
 # Prisma
 *.db
 *.db-journal
+.env
