@@ -15,6 +15,7 @@ interface Submission {
 const { data: submissions, pending: loading, refresh } = await useFetch<Submission[]>('/api/submissions')
 
 const editingId = ref<string | null>(null)
+const uploading = ref(false)
 const editForm = ref({
   status: '',
   response: '',
@@ -33,6 +34,28 @@ const startEditing = (submission: Submission) => {
 const cancelEditing = () => {
   editingId.value = null
   editForm.value = { status: '', response: '', responseUrl: '' }
+}
+
+const handleFileUpload = async (event: Event) => {
+  const input = event.target as HTMLInputElement
+  if (!input.files || input.files.length === 0) return
+
+  uploading.value = true
+  const file = input.files[0]
+  const formData = new FormData()
+  formData.append('file', file)
+
+  try {
+    const result = await $fetch<{ url: string }>('/api/upload', {
+      method: 'POST',
+      body: formData
+    })
+    editForm.value.responseUrl = result.url
+  } catch (error) {
+    console.error('Upload failed:', error)
+  } finally {
+    uploading.value = false
+  }
 }
 
 const updateSubmission = async (id: string) => {
@@ -75,7 +98,7 @@ const formatDate = (dateString: string) => {
       <div class="content">
         <div style="margin-bottom: 2rem; display: flex; gap: 1rem">
           <NuxtLink to="/" class="nav-link">Back</NuxtLink>
-          <NuxtLink to="/vote" class="nav-link">Vote Page</NuxtLink>
+          <NuxtLink to="/vote" class="nav-link">Vote</NuxtLink>
         </div>
 
         <div class="admin-grid">
@@ -104,11 +127,9 @@ const formatDate = (dateString: string) => {
               {{ submission.content }}
             </div>
 
-            <div v-if="submission.responseUrl" style="margin-top: 1rem">
-              <div class="label">Response URL</div>
-              <a :href="submission.responseUrl" target="_blank" rel="noopener noreferrer" style="text-decoration: underline">
-                {{ submission.responseUrl }}
-              </a>
+            <div v-if="submission.responseUrl" class="upload-preview">
+              <div class="label">Completed Visual</div>
+              <img :src="submission.responseUrl" alt="Completed visual" />
             </div>
 
             <div v-if="submission.response" style="margin-top: 1rem; padding: 1rem; background: #111; border: 1px solid var(--border)">
@@ -129,7 +150,17 @@ const formatDate = (dateString: string) => {
                 </div>
 
                 <div class="form-group">
-                  <label>Response URL</label>
+                  <label>Upload Visual</label>
+                  <input type="file" accept="image/*" @change="handleFileUpload" :disabled="uploading" />
+                  <div v-if="uploading" style="margin-top: 0.5rem; color: var(--muted)">Uploading...</div>
+                </div>
+
+                <div v-if="editForm.responseUrl" class="upload-preview">
+                  <img :src="editForm.responseUrl" alt="Preview" />
+                </div>
+
+                <div class="form-group">
+                  <label>Or paste URL</label>
                   <input v-model="editForm.responseUrl" type="text" placeholder="https://..." />
                 </div>
 
@@ -139,7 +170,7 @@ const formatDate = (dateString: string) => {
                 </div>
 
                 <div class="button-group">
-                  <button @click="updateSubmission(submission.id)">Save</button>
+                  <button @click="updateSubmission(submission.id)" :disabled="uploading">Save</button>
                   <button @click="cancelEditing">Cancel</button>
                 </div>
               </template>
