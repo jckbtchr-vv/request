@@ -8,6 +8,19 @@ interface Submission {
   createdAt: string
 }
 
+interface CompletedVisual {
+  id: string
+  title: string
+  description: string | null
+  imageUrl: string
+  createdAt: string
+}
+
+interface User {
+  id: string
+  username: string
+}
+
 // Form state
 const content = ref('')
 const socialHandle = ref('')
@@ -19,22 +32,48 @@ const success = ref(false)
 // Vote state
 const votedIds = ref<Set<string>>(new Set())
 
+// User state
+const currentUser = ref<User | null>(null)
+
 // Fetch approved (for voting) and completed (for browsing)
 const { data: approved, refresh: refreshApproved } = await useFetch<Submission[]>('/api/submissions/approved')
 const { data: completed, refresh: refreshCompleted } = await useFetch<Submission[]>('/api/submissions/completed')
+const { data: visuals } = await useFetch<CompletedVisual[]>('/api/visuals')
 
-onMounted(() => {
+onMounted(async () => {
   const stored = localStorage.getItem('votedIds')
   if (stored) {
     votedIds.value = new Set(JSON.parse(stored))
+  }
+
+  // Check for logged in user
+  const userId = localStorage.getItem('user_id')
+  if (userId) {
+    try {
+      const user = await $fetch<User | null>('/api/auth/me', {
+        headers: { 'x-user-id': userId }
+      })
+      if (user) {
+        currentUser.value = user
+      } else {
+        localStorage.removeItem('user_id')
+      }
+    } catch {
+      localStorage.removeItem('user_id')
+    }
   }
 })
 
 const handleSubmit = async () => {
   isSubmitting.value = true
   try {
+    const headers: Record<string, string> = {}
+    if (currentUser.value) {
+      headers['x-user-id'] = currentUser.value.id
+    }
     await $fetch('/api/submissions', {
       method: 'POST',
+      headers,
       body: {
         content: content.value,
         socialHandle: socialHandle.value,
@@ -75,6 +114,13 @@ const hasVoted = (id: string) => votedIds.value.has(id)
     <!-- SUBMIT -->
     <div class="column">
       <h2>Submit</h2>
+
+      <div v-if="currentUser" style="margin-bottom: 1rem; color: var(--muted);">
+        Logged in as <NuxtLink to="/profile" style="color: var(--fg);">{{ currentUser.username }}</NuxtLink>
+      </div>
+      <div v-else style="margin-bottom: 1rem; color: var(--muted);">
+        <NuxtLink to="/profile" style="color: var(--fg);">Login</NuxtLink> to track submissions
+      </div>
 
       <div v-if="success" class="success-message">Submitted</div>
 
@@ -126,8 +172,16 @@ const hasVoted = (id: string) => votedIds.value.has(id)
     <div class="column">
       <h2>Browse</h2>
 
-      <div v-if="!completed?.length" class="empty">No completed works yet</div>
+      <div v-if="!completed?.length && !visuals?.length" class="empty">No completed works yet</div>
 
+      <!-- Standalone visuals -->
+      <div v-for="visual in visuals" :key="visual.id" class="item">
+        <img :src="visual.imageUrl" :alt="visual.title" class="browse-image" />
+        <div class="item-content">{{ visual.title }}</div>
+        <div v-if="visual.description" class="item-meta">{{ visual.description }}</div>
+      </div>
+
+      <!-- Completed submissions -->
       <div v-for="item in completed" :key="item.id" class="item">
         <img v-if="item.responseUrl" :src="item.responseUrl" :alt="item.content" class="browse-image" />
         <div class="item-content">{{ item.content }}</div>

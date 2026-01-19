@@ -10,6 +10,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id           String       @id @default(cuid())
+  username     String       @unique
+  password     String       // hashed
+  createdAt    DateTime     @default(now())
+  submissions  Submission[]
+}
+
 model Submission {
   id           String   @id @default(cuid())
   content      String   // link or quote
@@ -20,6 +28,17 @@ model Submission {
   votes        Int      @default(0)
   response     String?  // admin notes
   responseUrl  String?  // uploaded visual URL
+  userId       String?  // optional link to user account
+  user         User?    @relation(fields: [userId], references: [id])
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+}
+
+// Standalone completed visuals uploaded by admin (not tied to submissions)
+model CompletedVisual {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  imageUrl    String
+  createdAt   DateTime @default(now())
 }

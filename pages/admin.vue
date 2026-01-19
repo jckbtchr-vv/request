@@ -118,6 +118,70 @@ const statusColor = (status: string) => {
   }
   return colors[status] || '#fff'
 }
+
+// Standalone visuals section
+interface CompletedVisual {
+  id: string
+  title: string
+  description: string | null
+  imageUrl: string
+  createdAt: string
+}
+
+const { data: visuals, refresh: refreshVisuals } = await useFetch<CompletedVisual[]>('/api/visuals')
+
+const visualForm = ref({
+  title: '',
+  description: '',
+  imageUrl: ''
+})
+const uploadingVisual = ref(false)
+
+const handleVisualFileUpload = async (event: Event) => {
+  const input = event.target as HTMLInputElement
+  if (!input.files || input.files.length === 0) return
+
+  uploadingVisual.value = true
+  const file = input.files[0]
+  const formData = new FormData()
+  formData.append('file', file)
+
+  try {
+    const result = await $fetch<{ url: string }>('/api/upload', {
+      method: 'POST',
+      body: formData
+    })
+    visualForm.value.imageUrl = result.url
+  } catch (error) {
+    console.error('Upload failed:', error)
+  } finally {
+    uploadingVisual.value = false
+  }
+}
+
+const createVisual = async () => {
+  if (!visualForm.value.title || !visualForm.value.imageUrl) return
+
+  try {
+    await $fetch('/api/visuals', {
+      method: 'POST',
+      body: visualForm.value
+    })
+    visualForm.value = { title: '', description: '', imageUrl: '' }
+    await refreshVisuals()
+  } catch (error) {
+    console.error('Failed to create visual:', error)
+  }
+}
+
+const deleteVisual = async (id: string) => {
+  try {
+    await $fetch(`/api/visuals/${id}`, { method: 'DELETE' })
+    await refreshVisuals()
+  } catch (error) {
+    console.error('Failed to delete visual:', error)
+  }
+}
 </script>
 
 <template>
@@ -151,6 +215,54 @@ const statusColor = (status: string) => {
       <div v-else>
         <div style="color: var(--muted); margin-bottom: 2rem;">{{ submissions?.length || 0 }} submissions</div>
 
+        <!-- Standalone Visuals Section -->
+        <div style="margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--border);">
+          <h3 style="margin: 0 0 1rem 0;">Upload Standalone Visual</h3>
+
+          <div class="form-group">
+            <label>Title</label>
+            <input v-model="visualForm.title" type="text" placeholder="Visual title..." />
+          </div>
+
+          <div class="form-group">
+            <label>Description (optional)</label>
+            <textarea v-model="visualForm.description" placeholder="Brief description..." />
+          </div>
+
+          <div class="form-group">
+            <label>Upload Image</label>
+            <input type="file" accept="image/*" @change="handleVisualFileUpload" :disabled="uploadingVisual" />
+            <div v-if="uploadingVisual" class="item-meta">Uploading...</div>
+          </div>
+
+          <div v-if="visualForm.imageUrl" style="margin-bottom: 1rem;">
+            <img :src="visualForm.imageUrl" alt="Preview" style="max-width: 200px; border: 1px solid var(--border);" />
+          </div>
+
+          <div class="form-group">
+            <label>Or paste URL</label>
+            <input v-model="visualForm.imageUrl" type="text" placeholder="https://..." />
+          </div>
+
+          <button @click="createVisual" :disabled="!visualForm.title || !visualForm.imageUrl || uploadingVisual">
+            Add Visual
+          </button>
+
+          <!-- Existing Visuals -->
+          <div v-if="visuals?.length" style="margin-top: 2rem;">
+            <div class="item-meta" style="margin-bottom: 1rem;">{{ visuals.length }} standalone visual{{ visuals.length !== 1 ? 's' : '' }}</div>
+            <div v-for="visual in visuals" :key="visual.id" class="item" style="display: flex; gap: 1rem; align-items: flex-start;">
+              <img :src="visual.imageUrl" :alt="visual.title" style="width: 80px; height: 80px; object-fit: cover; border: 1px solid var(--border);" />
+              <div style="flex: 1;">
+                <div>{{ visual.title }}</div>
+                <div v-if="visual.description" class="item-meta">{{ visual.description }}</div>
+                <button @click="deleteVisual(visual.id)" style="margin-top: 0.5rem; padding: 0.25rem 0.5rem; border-color: #dc3545; color: #dc3545;">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 style="margin: 0 0 1rem 0;">Submissions</h3>
         <div v-if="!submissions?.length" class="empty">No submissions yet.</div>
 
         <div v-for="submission in submissions" :key="submission.id" class="item">

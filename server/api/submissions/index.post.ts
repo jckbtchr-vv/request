@@ -2,6 +2,7 @@ import { prisma } from '~/server/utils/prisma'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
+  const userId = getHeader(event, 'x-user-id')
 
   if (!body.content || !body.socialHandle) {
     throw createError({
@@ -15,7 +16,8 @@ export default defineEventHandler(async (event) => {
       content: body.content,
       socialHandle: body.socialHandle,
       email: body.email || null,
-      isPublic: body.isPublic !== false
+      isPublic: body.isPublic !== false,
+      userId: userId || null
     }
   })
 
