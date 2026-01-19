@@ -39,8 +39,8 @@ h1, h2, h3, h4, p, span, a, label, input, textarea, select, button, div {
 }
 
 h2 {
-  margin: 0 0 1.5rem 0;
-  padding-bottom: 1rem;
+  margin: 0 -2rem 1.5rem -2rem;
+  padding: 0 2rem 1rem 2rem;
   border-bottom: 1px solid var(--border);
 }
 
