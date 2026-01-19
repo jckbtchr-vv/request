@@ -1,6 +1,6 @@
 # VV Request Submission App
 
-A minimalist request submission application for collecting visual requests in VV (Visualize Value) style. Users can submit links or quotes along with their social handles, and admins can review, respond, and upload completed visuals through a clean dashboard interface.
+A minimalist request submission application for collecting visual requests in VV (Visualize Value) style. Built with **Nuxt 3**. Users can submit links or quotes along with their social handles, and admins can review, respond, and upload completed visuals through a clean dashboard interface.
 
 ## Features
 
@@ -22,9 +22,9 @@ A minimalist request submission application for collecting visual requests in VV
 
 ## Tech Stack
 
-- **Framework**: Next.js 16 (App Router)
-- **Database**: SQLite with Prisma ORM
-- **Styling**: Custom CSS with VV design system
+- **Framework**: Nuxt 3
+- **Database**: PostgreSQL with Prisma ORM
+- **Styling**: Tailwind CSS + Custom VV design system
 - **TypeScript**: Full type safety
 - **Fonts**: T26 Carbon (headings), Departure Mono (monospace)
 
@@ -33,6 +33,7 @@ A minimalist request submission application for collecting visual requests in VV
 ### Prerequisites
 - Node.js 18+
 - npm or yarn
+- PostgreSQL database (or Vercel Postgres)
 
 ### Installation
 
@@ -47,20 +48,26 @@ cd request
 npm install
 ```
 
-3. Set up the database:
+3. Set up environment variables:
+```bash
+cp .env.example .env
+# Edit .env with your DATABASE_URL
+```
+
+4. Generate Prisma client and run migrations:
 ```bash
 npx prisma generate
 npx prisma migrate dev
 ```
 
-4. Run the development server:
+5. Run the development server:
 ```bash
 npm run dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) to see the submission form
+6. Open [http://localhost:3000](http://localhost:3000) to see the submission form
 
-6. Access the admin dashboard at [http://localhost:3000/admin](http://localhost:3000/admin)
+7. Access the admin dashboard at [http://localhost:3000/admin](http://localhost:3000/admin)
 
 ## Database Schema
 
@@ -85,12 +92,12 @@ model Submission {
 
 ## Design System
 
-The app uses the VV design aesthetic inspired by the oracle-rbr-presentation fork:
+The app uses the VV design aesthetic:
 
-- **Typography**: 
+- **Typography**:
   - Headings: T26 Carbon (uppercase, tight letter spacing)
   - Body: Departure Mono (monospace)
-- **Colors**: 
+- **Colors**:
   - Background: `#ffffff`
   - Foreground: `#050505`
   - Muted: `#7a7a7a`
@@ -99,38 +106,44 @@ The app uses the VV design aesthetic inspired by the oracle-rbr-presentation for
 
 ## Deployment
 
-Deploy to Vercel with one click:
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/jckbtchr-vv/request)
-
-Or deploy manually:
+### Vercel
 
 1. Push to GitHub
 2. Connect to Vercel
-3. Deploy with default settings
-4. Database will be automatically created
+3. Add environment variable: `DATABASE_URL` (your Vercel Postgres connection string)
+4. Deploy with default settings
+
+### Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
 
 ## Project Structure
 
 ```
 request/
-├── app/
+├── pages/
+│   ├── index.vue              # Public submission form
+│   └── admin.vue              # Admin dashboard
+├── server/
 │   ├── api/
 │   │   └── submissions/
-│   │       ├── route.ts           # List & create submissions
-│   │       └── [id]/route.ts      # Update submissions
-│   ├── admin/
-│   │   └── page.tsx               # Admin dashboard
-│   ├── page.tsx                   # Public submission form
-│   ├── layout.tsx                 # Root layout
-│   └── globals.css                # VV styling
-├── lib/
-│   └── prisma.ts                  # Prisma client singleton
+│   │       ├── index.get.ts   # List submissions
+│   │       ├── index.post.ts  # Create submission
+│   │       └── [id].patch.ts  # Update submission
+│   └── utils/
+│       └── prisma.ts          # Prisma client singleton
+├── assets/
+│   └── css/
+│       └── main.css           # VV styling
 ├── prisma/
-│   ├── schema.prisma              # Database schema
-│   └── migrations/                # Database migrations
-└── public/
-    └── fonts/                     # T26 Carbon & Departure Mono
+│   ├── schema.prisma          # Database schema
+│   └── migrations/            # Database migrations
+├── public/
+│   └── fonts/                 # T26 Carbon & Departure Mono
+├── app.vue                    # Root app component
+└── nuxt.config.ts             # Nuxt configuration
 ```
 
 ## License
