@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "prisma generate && prisma migrate deploy && nuxt build",
+    "build": "nuxt build",
+    "build:with-db": "prisma generate && prisma migrate deploy && nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",

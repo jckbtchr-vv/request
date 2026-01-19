@@ -110,14 +110,19 @@ The app uses the VV design aesthetic:
 
 1. Push to GitHub
 2. Connect to Vercel
-3. Add environment variable: `DATABASE_URL` (your Vercel Postgres connection string)
-4. Deploy with default settings
+3. Add a Vercel Postgres database:
+   - Go to Storage tab → Create Database → Postgres
+   - This automatically sets `DATABASE_URL` and related env vars
+4. Set the build command to: `npm run build:with-db`
+5. Deploy
+
+**Important**: The default `npm run build` skips database setup. Use `npm run build:with-db` to include Prisma migrations.
 
 ### Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `DATABASE_URL` | PostgreSQL connection string |
+| `DATABASE_URL` | PostgreSQL connection string (set automatically by Vercel Postgres) |
 
 ## Project Structure
 
