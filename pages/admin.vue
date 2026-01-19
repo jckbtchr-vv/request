@@ -66,35 +66,25 @@ const formatDate = (dateString: string) => {
 
     <template v-else>
       <div class="hero">
-        <h1>Admin Dashboard</h1>
-        <p class="mono" style="font-size: 1.1rem; max-width: 760px">
-          Review and respond to visual requests. Total submissions: {{ submissions?.length || 0 }}
-        </p>
+        <h1>Admin</h1>
+        <p>{{ submissions?.length || 0 }} submissions</p>
       </div>
 
       <div class="content">
-        <div style="text-align: right; margin-bottom: 2rem">
-          <NuxtLink to="/" class="nav-link">
-            Back to Form
-          </NuxtLink>
+        <div style="margin-bottom: 2rem">
+          <NuxtLink to="/" class="nav-link">Back</NuxtLink>
         </div>
 
         <div class="admin-grid">
-          <div v-if="!submissions?.length" style="text-align: center; padding: 4rem 0">
-            <p class="mono" style="color: var(--muted)">
-              No submissions yet.
-            </p>
+          <div v-if="!submissions?.length" style="padding: 2rem 0; color: var(--muted)">
+            No submissions yet.
           </div>
 
           <div v-for="submission in submissions" :key="submission.id" class="submission-card">
             <div class="submission-header">
               <div>
-                <div class="submission-meta">
-                  Submitted: {{ formatDate(submission.createdAt) }}
-                </div>
-                <div class="submission-meta">
-                  Handle: {{ submission.socialHandle }}
-                </div>
+                <div class="submission-meta">{{ formatDate(submission.createdAt) }}</div>
+                <div class="submission-meta">{{ submission.socialHandle }}</div>
               </div>
               <span :class="`status-badge status-${submission.status}`">
                 {{ submission.status }}
@@ -106,32 +96,22 @@ const formatDate = (dateString: string) => {
             </div>
 
             <div v-if="submission.responseUrl" style="margin-top: 1rem">
-              <div class="label" style="margin-bottom: 0.5rem">Response URL:</div>
-              <a
-                :href="submission.responseUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                style="font-family: 'Departure Mono', monospace; font-size: 0.9rem; color: var(--accent); text-decoration: underline"
-              >
+              <div class="label">Response URL</div>
+              <a :href="submission.responseUrl" target="_blank" rel="noopener noreferrer" style="text-decoration: underline">
                 {{ submission.responseUrl }}
               </a>
             </div>
 
-            <div v-if="submission.response" style="margin-top: 1rem; padding: 1rem; background: #f5f5f5">
-              <div class="label" style="margin-bottom: 0.5rem">Admin Notes:</div>
-              <p class="mono" style="font-size: 0.9rem; margin: 0">
-                {{ submission.response }}
-              </p>
+            <div v-if="submission.response" style="margin-top: 1rem; padding: 1rem; background: #111; border: 1px solid var(--border)">
+              <div class="label">Notes</div>
+              <p style="margin: 0">{{ submission.response }}</p>
             </div>
 
             <div class="response-form">
               <template v-if="editingId === submission.id">
                 <div class="form-group">
                   <label>Status</label>
-                  <select
-                    v-model="editForm.status"
-                    style="width: 100%; padding: 0.75rem; border: 1px solid var(--grid); background: white; font-family: 'Departure Mono', monospace"
-                  >
+                  <select v-model="editForm.status">
                     <option value="pending">Pending</option>
                     <option value="completed">Completed</option>
                     <option value="rejected">Rejected</option>
@@ -139,36 +119,23 @@ const formatDate = (dateString: string) => {
                 </div>
 
                 <div class="form-group">
-                  <label>Response URL (uploaded visual)</label>
-                  <input
-                    v-model="editForm.responseUrl"
-                    type="text"
-                    placeholder="https://..."
-                    style="width: 100%; padding: 0.75rem; border: 1px solid var(--grid); font-family: 'Departure Mono', monospace"
-                  />
+                  <label>Response URL</label>
+                  <input v-model="editForm.responseUrl" type="text" placeholder="https://..." />
                 </div>
 
                 <div class="form-group">
-                  <label>Admin Notes</label>
-                  <textarea
-                    v-model="editForm.response"
-                    placeholder="Internal notes..."
-                    style="width: 100%; padding: 0.75rem; border: 1px solid var(--grid); min-height: 100px; font-family: 'Departure Mono', monospace"
-                  />
+                  <label>Notes</label>
+                  <textarea v-model="editForm.response" placeholder="Internal notes..." />
                 </div>
 
                 <div class="button-group">
-                  <button @click="updateSubmission(submission.id)">
-                    Save Changes
-                  </button>
-                  <button style="opacity: 0.7" @click="cancelEditing">
-                    Cancel
-                  </button>
+                  <button @click="updateSubmission(submission.id)">Save</button>
+                  <button @click="cancelEditing">Cancel</button>
                 </div>
               </template>
 
               <button v-else style="width: 100%" @click="startEditing(submission)">
-                Edit Response
+                Edit
               </button>
             </div>
           </div>

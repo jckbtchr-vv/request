@@ -36,20 +36,16 @@ const handleSubmit = async () => {
   <div>
     <div class="hero">
       <h1>Request a Visual</h1>
-      <p class="mono" style="font-size: 1.1rem; max-width: 760px">
-        Submit your link or quote with your social handle to request a visual in VV style.
-      </p>
+      <p>Submit your link or quote with your social handle to request a visual.</p>
     </div>
 
     <div class="content">
-      <div style="text-align: right; margin-bottom: 2rem">
-        <NuxtLink to="/admin" class="nav-link">
-          Admin Dashboard
-        </NuxtLink>
+      <div style="margin-bottom: 2rem">
+        <NuxtLink to="/admin" class="nav-link">Admin</NuxtLink>
       </div>
 
-      <div v-if="success" class="success-message" style="margin-bottom: 2rem">
-        ✓ Request Submitted Successfully
+      <div v-if="success" class="success-message">
+        Request Submitted
       </div>
 
       <div class="form-card">
