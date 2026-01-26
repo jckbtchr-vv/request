@@ -2,27 +2,16 @@
   "name": "vv-request",
   "private": true,
   "type": "module",
-  "engines": {
-    "node": "^20.19.0 || >=22.12.0"
-  },
   "scripts": {
-    "build": "prisma generate && prisma db push && nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "start": "node .output/server/index.mjs",
-    "postinstall": "nuxt prepare",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev"
+    "start": "node server.js",
+    "build": "prisma generate && prisma db push",
+    "dev": "node server.js"
   },
   "dependencies": {
     "@prisma/client": "^5.10.0",
-    "nuxt": "^3.17.4",
-    "vue": "^3.5.16"
+    "express": "^4.18.2"
   },
   "devDependencies": {
-    "@nuxtjs/tailwindcss": "^6.14.0",
-    "prisma": "^5.10.0",
-    "typescript": "^5.8.3"
+    "prisma": "^5.10.0"
   }
 }

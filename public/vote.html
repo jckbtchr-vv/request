@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vote - VV Request</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="hero">
+    <h1>VOTE</h1>
+    <p style="color: var(--muted); margin-top: 1rem;">Upvote approved requests</p>
+  </div>
+
+  <div class="content">
+    <div id="submissions"></div>
+
+    <div class="nav-links">
+      <a href="/" class="nav-link">SUBMIT REQUEST</a>
+      <a href="/admin" class="nav-link">ADMIN</a>
+    </div>
+  </div>
+
+  <script>
+    const votedIds = JSON.parse(localStorage.getItem('votedIds') || '[]');
+
+    async function loadSubmissions() {
+      const res = await fetch('/api/submissions/approved');
+      const submissions = await res.json();
+      const container = document.getElementById('submissions');
+
+      if (submissions.length === 0) {
+        container.innerHTML = '<div class="empty-state">No approved submissions to vote on yet.</div>';
+        return;
+      }
+
+      container.innerHTML = submissions.map(s => `
+        <div class="vote-card">
+          <div class="submission-content">${escapeHtml(s.content)}</div>
+          <div class="vote-info">
+            <span style="color: var(--muted);">@${escapeHtml(s.socialHandle)}</span>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+              <span class="vote-count">${s.votes} votes</span>
+              <button onclick="vote('${s.id}')" ${votedIds.includes(s.id) ? 'disabled' : ''}>
+                ${votedIds.includes(s.id) ? 'VOTED' : 'UPVOTE'}
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function vote(id) {
+      if (votedIds.includes(id)) return;
+
+      const res = await fetch(`/api/submissions/${id}/vote`, { method: 'POST' });
+      if (res.ok) {
+        votedIds.push(id);
+        localStorage.setItem('votedIds', JSON.stringify(votedIds));
+        loadSubmissions();
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    loadSubmissions();
+  </script>
+</body>
+</html>
