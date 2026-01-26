@@ -2,6 +2,9 @@
   "name": "vv-request",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "prisma generate && prisma db push && nuxt build",
     "dev": "nuxt dev",
