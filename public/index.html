@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VV Request</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="hero">
+    <h1>VV REQUEST</h1>
+    <p style="color: var(--muted); margin-top: 1rem;">Submit your visual request</p>
+  </div>
+
+  <div class="content">
+    <div id="success" class="success-message" style="display: none;">
+      Request submitted successfully
+    </div>
+
+    <div class="form-card">
+      <h2>NEW REQUEST</h2>
+      <form id="requestForm">
+        <div class="form-group">
+          <label>CONTENT (link or quote)</label>
+          <textarea name="content" placeholder="paste a link or write a quote..." required></textarea>
+        </div>
+        <div class="form-group">
+          <label>SOCIAL HANDLE</label>
+          <input type="text" name="socialHandle" placeholder="@username" required>
+        </div>
+        <div class="form-group">
+          <label>EMAIL (optional, for notification)</label>
+          <input type="email" name="email" placeholder="you@example.com">
+        </div>
+        <button type="submit">SUBMIT REQUEST</button>
+      </form>
+    </div>
+
+    <div class="nav-links">
+      <a href="/vote" class="nav-link">VOTE ON REQUESTS</a>
+      <a href="/admin" class="nav-link">ADMIN</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('requestForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        content: form.content.value,
+        socialHandle: form.socialHandle.value,
+        email: form.email.value || null
+      };
+
+      try {
+        const res = await fetch('/api/submissions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+          form.reset();
+          document.getElementById('success').style.display = 'block';
+          setTimeout(() => {
+            document.getElementById('success').style.display = 'none';
+          }, 5000);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>
