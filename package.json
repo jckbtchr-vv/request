@@ -3,11 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "nuxt build",
-    "build:with-db": "prisma generate && prisma migrate deploy && nuxt build",
+    "build": "prisma generate && prisma db push && nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "start": "node .output/server/index.mjs",
     "postinstall": "nuxt prepare",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev"
